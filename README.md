@@ -55,8 +55,8 @@ define(["i19n!viewmodels/login.strings"], function(i19n) {
 The ```viewmodels/login``` module has one property called ```loginLabel``` that uses ```i19n.username``` property to show 
 the localized value for the label - username. 
 
-Later, when you want to add a specific translation to a file, say for the **en-au** locale, change 
-```viewmodels\login.strings``` to look like so:
+Adding a specific translation (e.g. for the en-au locale) is a simple two step process. 
+First, you need to tell your master/fallback file about the supported locale using the supportedLocales property:
 
 ```javascript
   define(
@@ -73,8 +73,8 @@ Later, when you want to add a specific translation to a file, say for the **en-a
 The ```supportedLocales``` property tells the i19n plugin that a file called ```viewmodels/login.strings.en-au.js``` 
 exists with localized strings and needs to be loaded.
 
-Localized string modules are defined slightly different from the *master/fallback* files. They do not need 
-the ```root``` wrapper and ```supportedLocales``` properties.
+Second, you need to create your localized string module. These are defined slightly differently from the 
+```master/fallback``` files as they do not need the ```root``` wrapper and ```supportedLocales``` properties.
 
 The contents of the ```viewmodels/login.strings.en-au.js``` file should override **some** or **all** strings that have a localized value. 
 
