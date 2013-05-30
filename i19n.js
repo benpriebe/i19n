@@ -29,10 +29,7 @@
 (function () {
     'use strict';
 
-    // has dependency on jquery; not ideal but haven't got time at the moment to write this functionality.
-    function mixin(target, source, force) {
-        $.extend(force, target, source);
-    }
+    var hasProperty = Object.prototype.hasOwnProperty;
 
     if (!Array.prototype.indexOf) {
         Array.prototype.indexOf = function (theItem) {
@@ -45,15 +42,53 @@
         };
     }
 
-   define(['module'], function(module) {
+    if (!Array.prototype.forEach) {
+        Array.prototype.forEach = function (fn) {
+            for (var i = 0; i < this.length; i++) {
+                fn(this[i]);
+            }
+        };
+    }
 
+    function mixin(base) {
+        if (!arguments.length)
+            throw "Nothing to extend";
+
+        if (arguments.length == 1)
+            return base;
+
+        var extensions = Array.prototype.slice.call(arguments, 1);
+
+        extensions.forEach(function (extension) {
+            for (var prop in extension) {
+                // ignore inherited
+                if (!hasProperty.call(extension, prop))
+                    continue;
+
+                // don't extend the base object if it doesn't already have this property
+                if (!hasProperty.call(base, prop))
+                    continue;
+
+                var value = extension[prop];
+                if (typeof value === "string") {
+                    base[prop] = value;
+
+                } else {
+                    base[prop] = mixin(base[prop], value);
+                }
+            }
+        });
+
+        return base;
+    };
+
+    define(['module'], function(module) {
         var moduleConfig = module.config ? module.config() : {};
 
         return {
             version: '2.0.1+',
 
             load: function (name, req, onLoad, config) {
-                
                 if (!moduleConfig.locale) {
                     moduleConfig.locale = typeof navigator === "undefined" ? "" : (navigator.language || navigator.userLanguage || "").toLowerCase();
                 }
@@ -64,22 +99,26 @@
                         var currentLocale = "", part, i;
                         var supportedLocales = rootModule.supportedLocales || moduleConfig.supportedLocales || [];
                         var localesToLoad = [];
+
                         for (i = 0; i < parts.length; i++) {
                             part = parts[i];
                             currentLocale += (currentLocale ? "-" : "") + part;
                             if (supportedLocales.indexOf(currentLocale) > -1)
                                 localesToLoad.push(name + "." + currentLocale);
                         }
+
                         req(localesToLoad, function() {
                             var localeStringsBuilder = {};
                             localesToLoad.forEach(function(moduleName) {
                                 var localeModule = req(moduleName);
-                                mixin(localeStringsBuilder, localeModule, true);
+                                mixin(localeStringsBuilder, localeModule);
 
                             });
-                            mixin(rootModule.root, localeStringsBuilder, true);
+
+                            mixin(rootModule.root, localeStringsBuilder);
                             onLoad(rootModule.root);
                         });
+
                     } else {
                         onLoad(rootModule.root);
                     }
