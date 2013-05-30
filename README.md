@@ -18,6 +18,10 @@ anywhere you want.
 
 You are not restricted to placing files in a specified directory structure.
 
+**Example File Structure**
+
+![alt text](https://raw.github.com/benpriebe/i19n/master/locale-bundles.png "Example File Structure")
+
 ###Getting Started###
 
 First you need to create your master (or fallback) bundle module.
