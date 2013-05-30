@@ -1,13 +1,19 @@
 i19n
 ====
 
-Provides i18n (internationalization) support as a RequireJS plugin. Like the i18n plugin - but one better ;)
+Provides i18n (internationalization) support as a RequireJS plugin.
+
+**Like the i18n plugin - but one better ;)**
+
+###Background###
 
 Please read the i18n.js RequireJS plugin documentation for background. 
 http://requirejs.org/docs/api.html#i18n
 
 This plugin aims to provide similar functionality but allowing you to place your locale specific files 
-anywhere you want. That's right, you are not restricted to placing files in a specified directory structure.
+anywhere you want. 
+
+That's right, you are not restricted to placing files in a specified directory structure.
 
 ###Getting Started###
 
