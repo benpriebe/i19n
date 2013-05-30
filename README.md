@@ -5,15 +5,18 @@ Provides i18n (internationalization) support as a RequireJS plugin.
 
 **Like the i18n plugin - but one better ;)**
 
-###Background###
+###Why not just use the RequireJS i18n plugin?###
 
-Please read the i18n.js RequireJS plugin documentation for background. 
 http://requirejs.org/docs/api.html#i18n
+
+The i18n plugin forces you to structure your locale bundles a specific way. This works ok in some circumstances 
+but if you want to have a resource file per view or use nested folders to structure your application, then creating 'nls/<locale> folders
+everywhere you want to have locale bundles can be hard to maintain.
 
 This plugin aims to provide similar functionality but allowing you to place your locale specific files 
 anywhere you want. 
 
-That's right, you are not restricted to placing files in a specified directory structure.
+You are not restricted to placing files in a specified directory structure.
 
 ###Getting Started###
 
