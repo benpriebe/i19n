@@ -50,14 +50,11 @@
         };
     }
 
-    function mixin(base) {
-        if (!arguments.length)
-            throw "Nothing to extend";
-
-        if (arguments.length == 1)
+    function mixin(base, shouldExtend, mixins) {
+        if (arguments.length < 3)
             return base;
 
-        var extensions = Array.prototype.slice.call(arguments, 1);
+        var extensions = Array.prototype.isPrototypeOf(mixins) ? mixins : [mixins];
 
         extensions.forEach(function (extension) {
             for (var prop in extension) {
@@ -65,8 +62,9 @@
                 if (!hasProperty.call(extension, prop))
                     continue;
 
-                // don't extend the base object if it doesn't already have this property
-                if (!hasProperty.call(base, prop))
+                // don't extend the base object if it doesn't already have this property, unless "shouldExtend" is true
+                var inBase = hasProperty.call(base, prop);
+                if (!(inBase || shouldExtend))
                     continue;
 
                 var value = extension[prop];
@@ -74,7 +72,9 @@
                     base[prop] = value;
 
                 } else {
-                    base[prop] = mixin(base[prop], value);
+                    base[prop] = inBase
+                        ? mixin(base[prop], shouldExtend, value)
+                        : mixin({}, shouldExtend, value);
                 }
             }
         });
@@ -108,15 +108,13 @@
                         }
 
                         req(localesToLoad, function() {
-                            var localeStringsBuilder = {};
-                            localesToLoad.forEach(function(moduleName) {
-                                var localeModule = req(moduleName);
-                                mixin(localeStringsBuilder, localeModule);
+                            // clone root
+                            var clone = mixin({}, true, rootModule.root);
 
-                            });
+                            // mixin locales
+                            var mixed = mixin(clone, false, Array.prototype.slice.call(arguments, 0));
 
-                            mixin(rootModule.root, localeStringsBuilder);
-                            onLoad(rootModule.root);
+                            onLoad(mixed);
                         });
 
                     } else {
