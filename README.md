@@ -189,9 +189,10 @@ The contents of the i19n object will be:
 }
 ```
 
-###Dependencies###
+###Written By###
 
-Currently, there is a dependency on JQuery - $ - existing in the global namespace. This is to use the $.extend function.
+- Ben Priebe
+- Gerrod Thomas
 
 
 
