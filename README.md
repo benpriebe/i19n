@@ -55,7 +55,7 @@ define(["i19n!viewmodels/login.strings"], function(i19n) {
 The ```viewmodels/login``` module has one property called ```loginLabel``` that uses ```i19n.username``` property to show 
 the localized value for the label - username. 
 
-Adding a specific translation (e.g. for the en-au locale) is a simple two step process. 
+Adding a specific translation (e.g. for the en-AU locale) is a simple two step process.
 First, you need to tell your master/fallback file about the supported locale using the supportedLocales property:
 
 ```javascript
@@ -65,18 +65,18 @@ First, you need to tell your master/fallback file about the supported locale usi
           "username": "username", 
           "password": "password",
         },
-        supportedLocales : ["en-au"] // must be lowercase
+        supportedLocales : ["en-AU"] // must be lowercase
     }
   );
 ``` 
 
-The ```supportedLocales``` property tells the i19n plugin that a file called ```viewmodels/login.strings.en-au.js``` 
+The ```supportedLocales``` property tells the i19n plugin that a file called ```viewmodels/login.strings.en-AU.js```
 exists with localized strings and needs to be loaded.
 
 Second, you need to create your localized string module. These are defined slightly differently from the 
 ```master/fallback``` files as they do not need the ```root``` wrapper and ```supportedLocales``` properties.
 
-The contents of the ```viewmodels/login.strings.en-au.js``` file should override **some** or **all** strings that have a localized value. 
+The contents of the ```viewmodels/login.strings.en-AU.js``` file should override **some** or **all** strings that have a localized value.
 
 ```javascript
 define(
@@ -102,7 +102,7 @@ requirejs.config({
         //Set the config for the i18n
         //module ID
         i19n: {
-            locale: 'en-au'
+            locale: 'en-AU'
         }
     }
 });
@@ -127,9 +127,6 @@ In ASP.NET you could do something like this in a .cshtml file:
  </script>
 ```
 
-**NOTE:** RequireJS will always use a lowercase version of the locale, to avoid case issues, so all of the 
-directories and files on disk for i19n bundles should use lowercase locales.
-
 
 The i19n plugin allows you to build out localized string bundles with more specific *locale* strings replacing 
 less specific strings.
@@ -146,7 +143,7 @@ define(
       "password": "password",
       "forgotPassword" "I forgot my password"
     },
-    supportedLocales : ["en", "en-au"]
+    supportedLocales : ["en", "en-AU"]
   );
   
 // eg. viewmodels/login.strings.en.js  
@@ -157,17 +154,17 @@ define(
     }
  );
   
-// eg. viewmodels/login.strings.en-au.js
+// eg. viewmodels/login.strings.en-AU.js
 
 define(
     {
-      "password": "en-au - password", 
+      "password": "en-AU - password",
     }
  );
 
 ```
 
-When a module loads in the ```viewmodel/login.strings``` i19n module with a browser locale of 'en-au':
+When a module loads in the ```viewmodel/login.strings``` i19n module with a browser locale of 'en-AU':
 
 e.g.
 
@@ -184,10 +181,37 @@ The contents of the i19n object will be:
 ```javascript
 {
   "username": "en - username", 
-  "password": "en-au - password",
+  "password": "en-AU - password",
   "forgotPassword" "I forgot my password"
 }
 ```
+
+
+###Debugging Your Localized Strings###
+
+When you code in your native language and run the web app in the same language you can't be 100% sure
+that the string resources you see on screen are from an i19n bundle or just hard-coded in the code.
+
+Wouldn't it be great if you could visually see all the localized strings in your app?
+
+Simply override the i19n config locale setting to equal 'debug' to surround all localized strings with underscores.
+
+```javascript
+requirejs.config({
+    config: {
+        //Set the config for the i18n
+        //module ID
+        i19n: {
+            locale: 'debug'
+        }
+    }
+});
+```
+
+So a localized string value of 'This is some localized string' becomes '_This is some localized string_'.
+
+Now when you run your app you will easily be able to identify strings that are not localized.
+
 
 ###Written By###
 

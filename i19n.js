@@ -4,7 +4,7 @@
  */
 
 /**
- * This plugin handles i19n! prefixed modules. (you know i18n but one better...) 
+ * This plugin handles i19n! prefixed modules. (you know i18n but one better...)
  *
  * A regular module can have a dependency on an i19n bundle, but the regular
  * module does not want to specify what locale to load. So it just specifies
@@ -80,49 +80,83 @@
         });
 
         return base;
-    };
+    }
 
-    define(['module'], function(module) {
+    /**
+     * Surrounds the root localization string values with underscores.
+     */
+    function debugify(root) {
+        for (var prop in root) {
+            // ignore inherited
+            if (!hasProperty.call(root, prop))
+                continue;
+
+            var value = root[prop];
+            if (typeof value === "string") {
+                if (root[prop].indexOf("_") != 0 && root[prop].lastIndexOf("_") != root[prop].length - 1)
+                    root[prop] = "_" + value + "_";
+            } else {
+                root[prop] = debugify(root[prop]);
+            }
+        }
+        return root;
+    }
+
+    define(['module'], function (module) {
         var moduleConfig = module.config ? module.config() : {};
 
         return {
             version: '2.0.1+',
 
             load: function (name, req, onLoad, config) {
-                if (!moduleConfig.locale) {
-                    moduleConfig.locale = typeof navigator === "undefined" ? "" : (navigator.language || navigator.userLanguage || "").toLowerCase();
+
+                if (config.isBuild) {
+                    onLoad();
                 }
-
-                req([name], function (rootModule) {
-                    if (moduleConfig.locale) {
-                        var parts = moduleConfig.locale.split("-");
-                        var currentLocale = "", part, i;
-                        var supportedLocales = rootModule.supportedLocales || moduleConfig.supportedLocales || [];
-                        var localesToLoad = [];
-
-                        for (i = 0; i < parts.length; i++) {
-                            part = parts[i];
-                            currentLocale += (currentLocale ? "-" : "") + part;
-                            if (supportedLocales.indexOf(currentLocale) > -1)
-                                localesToLoad.push(name + "." + currentLocale);
-                        }
-
-                        req(localesToLoad, function() {
-                            // clone root
-                            var clone = mixin({}, true, rootModule.root);
-
-                            // mixin locales
-                            var mixed = mixin(clone, false, Array.prototype.slice.call(arguments, 0));
-
-                            onLoad(mixed);
-                        });
-
-                    } else {
-                        onLoad(rootModule.root);
+                else {
+                    if (!moduleConfig.locale) {
+                        moduleConfig.locale = typeof navigator === "undefined" ? "" : (navigator.language || navigator.userLanguage || "").toLowerCase();
                     }
-                });
+
+                    req([name], function (rootModule) {
+                        if (moduleConfig.locale) {
+
+                            if (moduleConfig.locale == "debug") {
+                                onLoad(debugify(rootModule.root));
+                            } else {
+
+                                var parts = moduleConfig.locale.split("-");
+                                var currentLocale = "", part, i;
+
+                                var supportedLocales = rootModule.supportedLocales || moduleConfig.supportedLocales || [];
+                                var localesToLoad = [];
+
+                                for (i = 0; i < parts.length; i++) {
+                                    part = parts[i];
+                                    currentLocale += (currentLocale ? "-" : "") + part;
+                                    if (supportedLocales.indexOf(currentLocale) > -1) {
+                                        var fullName = name + "." + currentLocale;
+                                        localesToLoad.push(fullName);
+                                    }
+                                }
+
+                                req(localesToLoad, function() {
+
+                                    // clone root
+                                    var clone = mixin({}, true, rootModule.root);
+
+                                    // mixin locales
+                                    var mixed = mixin(clone, false, Array.prototype.slice.call(arguments, 0));
+
+                                    onLoad(mixed);
+                                });
+                            }
+                        } else {
+                            onLoad(rootModule.root);
+                        }
+                    });
+                }
             }
         };
     });
 })();
-
